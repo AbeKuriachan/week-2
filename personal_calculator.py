@@ -4,6 +4,32 @@ Collects employee salary details and produces a financial breakdown.
 """
 
 
+def format_inr(amount):
+    """Format amount in Indian locale (e.g., ₹1,23,456.78)."""
+    is_negative = amount < 0
+    amount = abs(amount)
+    integer_part, _, decimal_part = f"{amount:.2f}".partition(".")
+
+    # Indian grouping: last 3 digits, then groups of 2
+    if len(integer_part) > 3:
+        last_three = integer_part[-3:]
+        rest = integer_part[:-3]
+        # Group remaining digits in pairs from the right
+        groups = []
+        while len(rest) > 2:
+            groups.append(rest[-2:])
+            rest = rest[:-2]
+        if rest:
+            groups.append(rest)
+        groups.reverse()
+        formatted = ",".join(groups) + "," + last_three
+    else:
+        formatted = integer_part
+
+    result = f"₹{formatted}.{decimal_part}"
+    return f"-{result}" if is_negative else result
+
+
 def get_employee_data():
     """Collect and validate employee financial inputs."""
     name = input("Enter employee name: ").strip()
@@ -63,21 +89,32 @@ def generate_report(name, annual_salary, tax_percent, savings_percent, monthly_r
     print("════════════════════════════════════════════")
     print("EMPLOYEE FINANCIAL SUMMARY")
     print("════════════════════════════════════════════")
-    print(f"Employee : {name}")
-    print(f"Annual Salary : ₹{annual_salary:,.2f}")
+    print(f"Employee      : {name}")
+    print(f"Annual Salary : {format_inr(annual_salary)}")
     print("────────────────────────────────────────────")
     print("Monthly Breakdown:")
-    print(f"Gross Salary : ₹ {finances['monthly_salary']:,.2f}")
-    print(f"Tax ({tax_percent:.1f}%) : ₹ {finances['tax_deduction']:,.2f}")
-    print(f"Net Salary : ₹ {finances['net_salary']:,.2f}")
-    print(f"Rent : ₹ {monthly_rent:,.2f} ({finances['rent_ratio']:.1f}% of net)")
-    print(f"Savings ({savings_percent:.1f}%) : ₹ {finances['savings_amount']:,.2f}")
-    print(f"Disposable : ₹ {finances['disposable_income']:,.2f}")
+    print(f"Gross Salary  : {format_inr(finances['monthly_salary'])}")
+    print(f"Tax ({tax_percent:.1f}%)     : {format_inr(finances['tax_deduction'])}")
+    print(f"Net Salary    : {format_inr(finances['net_salary'])}")
+    print(f"Rent          : {format_inr(monthly_rent)} ({finances['rent_ratio']:.1f}% of net)")
+    print(f"Savings ({savings_percent:.1f}%) : {format_inr(finances['savings_amount'])}")
+    print(f"Disposable    : {format_inr(finances['disposable_income'])}")
     print("────────────────────────────────────────────")
     print("Annual Projection:")
-    print(f"Total Tax : ₹ {finances['total_tax']:,.2f}")
-    print(f"Total Savings : ₹ {finances['total_savings']:,.2f}")
-    print(f"Total Rent : ₹ {finances['total_rent']:,.2f}")
+    print(f"Total Tax     : {format_inr(finances['total_tax'])}")
+    print(f"Total Savings : {format_inr(finances['total_savings'])}")
+    print(f"Total Rent    : {format_inr(finances['total_rent'])}")
+    print("────────────────────────────────────────────")
+    score = financial_health_score(finances, savings_percent)
+    if score >= 80:
+        rating = "Excellent 🟢"
+    elif score >= 60:
+        rating = "Good 🟡"
+    elif score >= 40:
+        rating = "Fair 🟠"
+    else:
+        rating = "Poor 🔴"
+    print(f"Health Score  : {score}/100 ({rating})")
     print("════════════════════════════════════════════")
 
 
@@ -89,6 +126,37 @@ def main():
         generate_report(name, annual_salary, tax_percent, savings_percent, monthly_rent, finances)
     except ValueError as e:
         print(f"Input Error: {e}")
+
+
+def financial_health_score(finances, savings_percent):
+    """Calculate financial health score (0-100)."""
+    score = 0
+
+    # Rent ratio contribution (max 30 points)
+    if finances['rent_ratio'] <= 30:
+        score += 30
+    elif finances['rent_ratio'] <= 40:
+        score += 20
+    else:
+        score += 10
+
+    # Savings contribution (max 40 points)
+    if savings_percent >= 20:
+        score += 40
+    elif savings_percent >= 10:
+        score += 25
+    else:
+        score += 10
+
+    disposable_ratio = (finances['disposable_income'] / finances['net_salary']) * 100
+    if disposable_ratio >= 40:
+        score += 30
+    elif disposable_ratio >= 20:
+        score += 20
+    else:
+        score += 10
+
+    return score
 
 
 if __name__ == "__main__":
