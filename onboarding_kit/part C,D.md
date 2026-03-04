@@ -1,3 +1,5 @@
+## PART C
+
 ### Q1️⃣ Conceptual — Virtual Environments
 
 In 3–4 sentences, explain to a non-technical interviewer what a virtual environment is
@@ -60,7 +62,7 @@ May have:
 - python -m pip show numpy
 - where python
 
-### q4
+## PART D
 
 prompt : Generate a beginner-friendly .pylintrc configuration file for a Python AI/ML project.
 
