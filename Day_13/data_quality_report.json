@@ -1,0 +1,42 @@
+{
+  "before": {
+    "total_rows": 53,
+    "total_missing": 31,
+    "missing_per_column": {
+      "customer_id": 0,
+      "name": 0,
+      "age": 8,
+      "city": 0,
+      "rating": 8,
+      "purchase_amount": 8,
+      "signup_date": 0,
+      "feedback": 7
+    },
+    "duplicate_count": 3,
+    "wrong_types": {
+      "age": "object",
+      "rating": "object",
+      "purchase_amount": "object"
+    },
+    "invalid_values": {
+      "age": "2 values outside 0-120"
+    }
+  },
+  "after": {
+    "total_rows": 48,
+    "total_missing": 7,
+    "missing_per_column": {
+      "customer_id": 0,
+      "name": 0,
+      "age": 0,
+      "city": 0,
+      "rating": 0,
+      "purchase_amount": 0,
+      "signup_date": 7,
+      "feedback": 0
+    },
+    "duplicate_count": 0,
+    "wrong_types": {},
+    "invalid_values": {}
+  }
+}
